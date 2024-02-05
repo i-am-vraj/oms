@@ -1,4 +1,4 @@
-package com.hyperface.oms.dto.eligibility;
+package com.hyperface.oms.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Condition {
-  private String field;
-  private Operator operator;
-  private double value;
+public class EligibilityResult {
+
+  private boolean eligible;
+  private double totalAmount;
 }

@@ -20,5 +20,5 @@ import lombok.ToString;
 })
 public abstract class EligibilityMetadata {
 
-  private String entity;
+  private Class entity;
 }
