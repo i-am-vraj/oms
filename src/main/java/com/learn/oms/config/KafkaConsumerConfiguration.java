@@ -1,6 +1,7 @@
 package com.learn.oms.config;
 
-import com.learn.oms.serdes.KafkaProtobufDeserializer;
+import com.google.protobuf.Message;
+import com.learn.oms.serdes.KafkaSampleDTODeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +22,14 @@ public class KafkaConsumerConfiguration {
   private String bootStrapServerAddress;
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+  public ConcurrentKafkaListenerContainerFactory<String, String> kafkaContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, String> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactory());
     return factory;
   }
 
-  private ConsumerFactory<String, Object> consumerFactory() {
+  private ConsumerFactory<String, String> consumerFactory() {
     return new DefaultKafkaConsumerFactory<>(consumerConfigs());
   }
 
@@ -41,15 +42,15 @@ public class KafkaConsumerConfiguration {
   }
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, Object>
-      kafkaContainerFactoryForProtobuf() {
-    ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+  public <T extends Message>
+      ConcurrentKafkaListenerContainerFactory<String, T> kafkaContainerFactoryForProtobuf() {
+    ConcurrentKafkaListenerContainerFactory<String, T> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactoryForProtobuf());
     return factory;
   }
 
-  private ConsumerFactory<String, Object> consumerFactoryForProtobuf() {
+  private <T extends Message> ConsumerFactory<String, T> consumerFactoryForProtobuf() {
     return new DefaultKafkaConsumerFactory<>(consumerConfigsForProtobuf());
   }
 
@@ -58,7 +59,7 @@ public class KafkaConsumerConfiguration {
     consumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServerAddress);
     consumerConfig.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     consumerConfig.put(
-        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
+        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaSampleDTODeserializer.class);
     return consumerConfig;
   }
 }
