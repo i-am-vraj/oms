@@ -5,7 +5,7 @@ plugins {
 	id 'com.diffplug.spotless' version '6.7.1'
 }
 
-group = 'com.hyperface'
+group = 'com.learn'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -28,9 +28,14 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	implementation 'org.rocksdb:rocksdbjni:7.3.1'
+	implementation 'com.google.protobuf:protobuf-java:3.25.3'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
