@@ -29,7 +29,7 @@ public class KafkaController {
   public ResponseEntity<Boolean> getOffers() {
     int id = new Random().nextInt();
     String email = "ervrajdesai999@gmail.com";
-    String name = "Vraj Desai" + id;
+    String name = "Vraj Desai " + id;
     ProtosContainer.SampleDto person =
         ProtosContainer.SampleDto.newBuilder().setId(id).setName(name).setEmail(email).build();
     kafkaProducer.pushToKafka(person.toString(), stringTopic);
