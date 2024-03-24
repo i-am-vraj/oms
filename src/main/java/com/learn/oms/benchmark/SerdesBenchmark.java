@@ -34,6 +34,7 @@ public class SerdesBenchmark {
   private final Parser<ProtosLargeContainer.SampleLargeDto> protoLargeParser =
       ProtosLargeContainer.SampleLargeDto.PARSER;
   private final ObjectReader jsonReader = Utils.mapper.readerFor(SamplePOJO.class);
+  private final ObjectReader jsonLargeReader = Utils.mapper.readerFor(SampleLargePOJO.class);
 
   private static Person getPerson() {
     int id = new Random().nextInt();
@@ -96,7 +97,7 @@ public class SerdesBenchmark {
   }
 
   public void consumeLarge(String payload) throws JsonProcessingException {
-    SampleLargePOJO sampleLargePOJO = jsonReader.readValue(payload);
+    SampleLargePOJO sampleLargePOJO = jsonLargeReader.readValue(payload);
   }
 
   @Benchmark
