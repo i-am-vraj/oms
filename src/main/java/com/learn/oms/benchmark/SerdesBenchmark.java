@@ -1,16 +1,17 @@
 package com.learn.oms.benchmark;
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Parser;
 import com.learn.oms.kafka.consumer.StringConsumer;
 import com.learn.oms.proto.ProtosContainer;
+import com.learn.oms.proto.ProtosLargeContainer;
+import com.learn.oms.proto.SampleLargePOJO;
 import com.learn.oms.proto.SamplePOJO;
 import com.learn.oms.utils.Utils;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -30,6 +31,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public class SerdesBenchmark {
 
   private final Parser<ProtosContainer.SampleDto> protoParser = ProtosContainer.SampleDto.PARSER;
+  private final Parser<ProtosLargeContainer.SampleLargeDto> protoLargeParser =
+      ProtosLargeContainer.SampleLargeDto.PARSER;
   private final ObjectReader jsonReader = Utils.mapper.readerFor(SamplePOJO.class);
 
   private static Person getPerson() {
@@ -87,6 +90,47 @@ public class SerdesBenchmark {
             .build();
 
     consume(person.toByteArray());
+
+    blackhole.consume(person);
+    blackhole.consume(record);
+  }
+
+  public void consumeLarge(String payload) throws JsonProcessingException {
+    SampleLargePOJO sampleLargePOJO = jsonReader.readValue(payload);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.Throughput)
+  @Warmup(iterations = 0)
+  @Measurement(iterations = 3)
+  @Fork(value = 3)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public void benchmarkJsonLarge(Blackhole blackhole) throws JsonProcessingException {
+    Person record = getPerson();
+    SampleLargePOJO person = SampleLargePOJO.builder().build();
+
+    consumeLarge(Utils.mapper.writeValueAsString(person));
+
+    blackhole.consume(person);
+    blackhole.consume(record);
+  }
+
+  public void consumeLarge(byte[] payload) throws InvalidProtocolBufferException {
+    ProtosLargeContainer.SampleLargeDto sampleLargeDto = protoLargeParser.parseFrom(payload);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.Throughput)
+  @Warmup(iterations = 0)
+  @Measurement(iterations = 3)
+  @Fork(value = 3)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public void benchmarkProtoLarge(Blackhole blackhole) throws InvalidProtocolBufferException {
+    Person record = getPerson();
+    ProtosLargeContainer.SampleLargeDto person =
+        ProtosLargeContainer.SampleLargeDto.newBuilder().build();
+
+    consumeLarge(person.toByteArray());
 
     blackhole.consume(person);
     blackhole.consume(record);
